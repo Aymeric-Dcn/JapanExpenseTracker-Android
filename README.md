@@ -1,4 +1,10 @@
 # 🇯🇵 Japan Expense Tracker – Android
+![Kotlin](https://img.shields.io/badge/Kotlin-1.9-blue?logo=kotlin)
+![Platform](https://img.shields.io/badge/Platform-Android-green?logo=android)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-UI-blue)
+![Architecture](https://img.shields.io/badge/Architecture-MVVM-orange)
+![Min SDK](https://img.shields.io/badge/Min%20SDK-24-blue)
+![Status](https://img.shields.io/badge/Status-Active-success)
 
 A mobile app to track daily expenses while traveling in Japan.
 
@@ -64,7 +70,7 @@ presentation/
 ## 🔗 Related Project
 
 👉 iOS version (SwiftUI):
-https://github.com/TON-REPO-IOS-ICI
+https://github.com/Aymeric-Dcn/JapanExpenseTracker-IOS
 
 
 ---
