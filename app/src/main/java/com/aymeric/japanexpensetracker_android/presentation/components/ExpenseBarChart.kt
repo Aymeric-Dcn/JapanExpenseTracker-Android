@@ -1,6 +1,8 @@
 package com.aymeric.japanexpensetracker_android.presentation.components
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -80,7 +82,7 @@ fun ExpenseBarChart(
                     Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
-                        text = expense.category.take(6),
+                        text = expense.category.take(5),
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
