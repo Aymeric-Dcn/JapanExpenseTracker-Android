@@ -2,6 +2,7 @@ package com.aymeric.japanexpensetracker_android.presentation.screens.stats
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aymeric.japanexpensetracker_android.presentation.viewmodel.ExpenseViewModel
+import com.aymeric.japanexpensetracker_android.utils.formatAmount
 
 @Composable
 fun StatsScreen(
@@ -33,8 +35,15 @@ fun StatsScreen(
 
     val totalSpent = expenses.sumOf { it.amountYen }
     val cashSpent = expenses.filter { it.paymentMethod == "Cash" }.sumOf { it.amountYen }
+    val cardSpent = expenses.filter { it.paymentMethod == "Card" }.sumOf { it.amountYen }
     val totalWithdrawals = withdrawals.sumOf { it.amountYen }
     val cashRemaining = viewModel.getCashRemaining()
+
+    val categoryTotals = expenses
+        .groupBy { it.category }
+        .mapValues { (_, values) -> values.sumOf { it.amountYen } }
+        .toList()
+        .sortedByDescending { it.second }
 
     Column(
         modifier = Modifier
@@ -47,7 +56,7 @@ fun StatsScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        androidx.compose.foundation.layout.Row(
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -58,12 +67,23 @@ fun StatsScreen(
             )
         }
 
-        StatCard("Total spent", formatStatsAmount(totalSpent, showEuro))
-        StatCard("Cash spent", formatStatsAmount(cashSpent, showEuro))
-        StatCard("Total withdrawals", formatStatsAmount(totalWithdrawals, showEuro))
-        StatCard("Cash remaining", formatStatsAmount(cashRemaining, showEuro))
+        StatCard("Total spent", formatAmount(totalSpent, showEuro))
+        StatCard("Cash spent", formatAmount(cashSpent, showEuro))
+        StatCard("Card spent", formatAmount(cardSpent, showEuro))
+        StatCard("Total withdrawals", formatAmount(totalWithdrawals, showEuro))
+        StatCard("Cash remaining", formatAmount(cashRemaining, showEuro))
         StatCard("Number of expenses", expenses.size.toString())
-        StatCard("Number of withdrawals", withdrawals.size.toString())
+
+        if (categoryTotals.isNotEmpty()) {
+            Text(
+                text = "Top categories",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            categoryTotals.take(5).forEach { (category, amount) ->
+                StatCard(category, formatAmount(amount, showEuro))
+            }
+        }
     }
 }
 
@@ -74,7 +94,7 @@ private fun StatCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -86,13 +106,5 @@ private fun StatCard(
                 style = MaterialTheme.typography.headlineSmall
             )
         }
-    }
-}
-
-private fun formatStatsAmount(amountYen: Double, showEuro: Boolean): String {
-    return if (showEuro) {
-        "%.2f €".format(amountYen * 0.0062)
-    } else {
-        "%.2f ¥".format(amountYen)
     }
 }
