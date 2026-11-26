@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.aymeric.japanexpensetracker_android.data.local.entity.ExpenseEntity
+import com.aymeric.japanexpensetracker_android.domain.model.PaymentMethod
 import com.aymeric.japanexpensetracker_android.utils.formatAmount
 import kotlin.math.max
 
@@ -29,9 +30,10 @@ import kotlin.math.max
 fun ExpenseBarChart(
     expenses: List<ExpenseEntity>,
     showEuro: Boolean,
+    yenToEur: Double,
     modifier: Modifier = Modifier
 ) {
-    val maxAmount = max(expenses.maxOfOrNull { it.amountYen } ?: 1.0, 1.0)
+    val maxAmount = max(expenses.maxOfOrNull { it.amountYen } ?: 1L, 1L)
     val maxHeight = 140.dp
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -50,11 +52,11 @@ fun ExpenseBarChart(
             verticalAlignment = Alignment.Bottom
         ) {
             expenses.forEach { expense ->
-                val ratio = (expense.amountYen / maxAmount).toFloat().coerceIn(0f, 1f)
-                val barColor = if (expense.paymentMethod == "Cash") {
-                    Color(0xFF2E7D32)
-                } else {
-                    Color(0xFF6A1B9A)
+                val ratio = (expense.amountYen.toFloat() / maxAmount).coerceIn(0f, 1f)
+                val barColor = when (expense.paymentMethod) {
+                    PaymentMethod.CASH -> Color(0xFF2E7D32)
+                    PaymentMethod.CARD -> Color(0xFF6A1B9A)
+                    PaymentMethod.IC_CARD -> Color(0xFF1565C0)
                 }
 
                 Column(
@@ -62,7 +64,7 @@ fun ExpenseBarChart(
                     verticalArrangement = Arrangement.Bottom
                 ) {
                     Text(
-                        text = formatAmount(expense.amountYen, showEuro),
+                        text = formatAmount(expense.amountYen, showEuro, yenToEur),
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 1
                     )

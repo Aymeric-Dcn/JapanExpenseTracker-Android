@@ -21,8 +21,9 @@ import com.aymeric.japanexpensetracker_android.utils.formatAmount
 
 @Composable
 fun CategoryPieChart(
-    data: List<Pair<String, Double>>,
+    data: List<Pair<String, Long>>,
     showEuro: Boolean,
+    yenToEur: Double,
     modifier: Modifier = Modifier
 ) {
     if (data.isEmpty()) {
@@ -33,7 +34,7 @@ fun CategoryPieChart(
         return
     }
 
-    val total = data.sumOf { it.second }.takeIf { it > 0 } ?: 1.0
+    val total = data.sumOf { it.second }.takeIf { it > 0 }?.toDouble() ?: 1.0
 
     val colors = listOf(
         Color(0xFF2E7D32),
@@ -95,7 +96,7 @@ fun CategoryPieChart(
                     }
 
                     Text(
-                        text = formatAmount(amount, showEuro),
+                        text = formatAmount(amount, showEuro, yenToEur),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

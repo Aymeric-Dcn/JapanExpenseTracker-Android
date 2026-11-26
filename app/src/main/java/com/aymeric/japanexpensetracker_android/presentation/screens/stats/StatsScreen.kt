@@ -2,6 +2,7 @@ package com.aymeric.japanexpensetracker_android.presentation.screens.stats
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,19 +11,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.aymeric.japanexpensetracker_android.domain.model.PaymentMethod
 import com.aymeric.japanexpensetracker_android.presentation.components.CategoryPieChart
+import com.aymeric.japanexpensetracker_android.presentation.components.CurrencyToggle
 import com.aymeric.japanexpensetracker_android.presentation.viewmodel.ExpenseViewModel
 import com.aymeric.japanexpensetracker_android.utils.formatAmount
 
@@ -33,25 +31,23 @@ fun StatsScreen(
 ) {
     val expenses by viewModel.expenses.collectAsState()
     val withdrawals by viewModel.withdrawals.collectAsState()
-
-    var showEuro by remember { mutableStateOf(false) }
+    val showEuro by viewModel.showEuro.collectAsState()
+    val rate by viewModel.exchangeRate.collectAsState()
+    val format = { yen: Long -> formatAmount(yen, showEuro, rate.yenToEur) }
 
     val totalSpent = expenses.sumOf { it.amountYen }
-    val cashSpent = expenses.filter { it.paymentMethod == "Cash" }.sumOf { it.amountYen }
-    val cardSpent = expenses.filter { it.paymentMethod == "Card" }.sumOf { it.amountYen }
     val totalWithdrawals = withdrawals.sumOf { it.amountYen }
     val cashRemaining = viewModel.getCashRemaining()
+
+    val paymentTotals = PaymentMethod.entries
+        .map { method -> method to expenses.filter { it.paymentMethod == method }.sumOf { it.amountYen } }
+        .filter { it.second > 0 }
 
     val categoryTotals = expenses
         .groupBy { it.category }
         .mapValues { (_, values) -> values.sumOf { it.amountYen } }
         .toList()
         .sortedByDescending { it.second }
-
-    val paymentTotals = listOf(
-        "Cash" to cashSpent,
-        "Card" to cardSpent
-    ).filter { it.second > 0.0 }
 
     Column(
         modifier = Modifier
@@ -65,22 +61,15 @@ fun StatsScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Show in euro")
-            Switch(
-                checked = showEuro,
-                onCheckedChange = { showEuro = it }
-            )
-        }
+        CurrencyToggle(
+            showEuro = showEuro,
+            onShowEuroChange = viewModel::setShowEuro,
+            rate = rate
+        )
 
-        StatCard("Total spent", formatAmount(totalSpent, showEuro))
-        StatCard("Cash spent", formatAmount(cashSpent, showEuro))
-        StatCard("Card spent", formatAmount(cardSpent, showEuro))
-        StatCard("Total withdrawals", formatAmount(totalWithdrawals, showEuro))
-        StatCard("Cash remaining", formatAmount(cashRemaining, showEuro))
+        StatCard("Total spent", format(totalSpent))
+        StatCard("Total withdrawals", format(totalWithdrawals))
+        StatCard("Cash remaining", format(cashRemaining))
         StatCard("Number of expenses", expenses.size.toString())
 
         Card(
@@ -90,7 +79,8 @@ fun StatsScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 CategoryPieChart(
                     data = categoryTotals.take(6),
-                    showEuro = showEuro
+                    showEuro = showEuro,
+                    yenToEur = rate.yenToEur
                 )
             }
         }
@@ -109,11 +99,8 @@ fun StatsScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
 
-                    paymentTotals.forEach { (label, amount) ->
-                        StatLine(
-                            title = label,
-                            value = formatAmount(amount, showEuro)
-                        )
+                    paymentTotals.forEach { (method, amount) ->
+                        StatLine(title = method.label, value = format(amount))
                     }
                 }
             }
