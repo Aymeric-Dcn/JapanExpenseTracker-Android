@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "JapanExpenseTracker-Android"
 include(":app")
+include(":felica")
