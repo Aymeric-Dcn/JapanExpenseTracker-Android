@@ -30,4 +30,9 @@ class ExpenseRepository(
 
     suspend fun insertWithdrawal(withdrawal: WithdrawalEntity) =
         withdrawalDao.insertWithdrawal(withdrawal)
+
+    suspend fun deleteAll() {
+        expenseDao.deleteAllExpenses()
+        withdrawalDao.deleteAllWithdrawals()
+    }
 }

@@ -28,11 +28,17 @@ object CsvExporter {
                 expense.paymentMethod.storageKey,
                 expense.category,
                 expense.note,
-                if (expense.externalId == null) "manual" else "ic_card"
+                sourceOf(expense.externalId)
             ).joinToString(",") { escape(it) }
         }
         val bom = if (withByteOrderMark) "﻿" else ""
         return bom + (listOf(HEADER) + lines).joinToString("\r\n") + "\r\n"
+    }
+
+    private fun sourceOf(externalId: String?): String = when {
+        externalId == null -> "manual"
+        externalId.startsWith("ic:") -> "ic_card"
+        else -> "demo"
     }
 
     internal fun escape(field: String): String =

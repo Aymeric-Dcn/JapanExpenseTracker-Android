@@ -1,5 +1,6 @@
 package com.aymeric.japanexpensetracker_android.presentation.screens.dashboard
 
+import android.content.pm.ApplicationInfo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,12 +13,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aymeric.japanexpensetracker_android.presentation.components.CurrencyToggle
@@ -41,6 +44,8 @@ fun DashboardScreen(
     val totalSpent = expenses.sumOf { it.amountYen }
     val cashRemaining = viewModel.getCashRemaining()
     val lowCash = cashRemaining < LOW_CASH_THRESHOLD_YEN
+    val context = LocalContext.current
+    val isDebugBuild = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
 
     Column(
         modifier = Modifier
@@ -130,5 +135,19 @@ fun DashboardScreen(
             title = "Statistics",
             onClick = { navController.navigate(Routes.Stats.route) }
         )
+
+        if (isDebugBuild) {
+            Text(
+                text = "Debug tools",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            OutlinedButton(onClick = viewModel::loadDemoData, modifier = Modifier.fillMaxWidth()) {
+                Text("Load demo data (replaces everything)")
+            }
+            OutlinedButton(onClick = viewModel::clearAllData, modifier = Modifier.fillMaxWidth()) {
+                Text("Clear all data")
+            }
+        }
     }
 }

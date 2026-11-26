@@ -14,6 +14,7 @@ import com.aymeric.japanexpensetracker_android.data.repository.ExchangeRateRepos
 import com.aymeric.japanexpensetracker_android.data.repository.ExpenseRepository
 import com.aymeric.japanexpensetracker_android.domain.model.ExchangeRate
 import com.aymeric.japanexpensetracker_android.domain.model.PaymentMethod
+import com.aymeric.japanexpensetracker_android.domain.usecase.DemoData
 import com.aymeric.japanexpensetracker_android.domain.usecase.GetCashRemainingUseCase
 import com.aymeric.japanexpensetracker_android.domain.usecase.ImportIcCardHistoryUseCase
 import com.aymeric.japanexpensetracker_android.utils.CsvExporter
@@ -137,6 +138,22 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
             }
             onDone(ok)
         }
+    }
+
+    // --- Demo data (debug builds only) ----------------------------------
+
+    /** Replaces everything with three weeks of sample data, for screenshots. */
+    fun loadDemoData() {
+        viewModelScope.launch {
+            val demo = DemoData.generate()
+            repository.deleteAll()
+            repository.importExpenses(demo.expenses)
+            demo.withdrawals.forEach { repository.insertWithdrawal(it) }
+        }
+    }
+
+    fun clearAllData() {
+        viewModelScope.launch { repository.deleteAll() }
     }
 
     // --- IC card ----------------------------------------------------------
