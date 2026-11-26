@@ -13,6 +13,11 @@ import the train fares and shop payments as expenses**, using the FeliCa protoco
 I built it for my robotics internship in Osaka (2026), where most daily spending went
 through cash and a transit IC card.
 
+## Download
+
+Get the signed APK from the [latest release](https://github.com/Aymeric-Dcn/JapanExpenseTracker-Android/releases/latest)
+(Android 7.0+). Releases are built and published by GitHub Actions when a version tag is pushed.
+
 ## Features
 
 - **IC card reading (Suica, Pasmo, ICOCA...)**: balance and last 20 transactions, read over
@@ -94,8 +99,9 @@ app/
 - `app`: cash remaining, filters (including weeks that span the new year), IC card import
   and de-duplication, currency formatting, CSV escaping, API response parsing.
 
-GitHub Actions runs the tests and builds the debug APK on every push; the APK is attached to
-each run as an artifact.
+GitHub Actions runs the tests and builds the debug APK on every push. Pushing a `v*` tag runs
+the [release workflow](.github/workflows/release.yml): tests, signed release APK, GitHub release.
+The signing keystore is stored as an encrypted repository secret, never in the code.
 
 ## Build
 
