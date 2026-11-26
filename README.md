@@ -13,6 +13,13 @@ import the train fares and shop payments as expenses**, using the FeliCa protoco
 I built it for my robotics internship in Osaka (2026), where most daily spending went
 through cash and a transit IC card.
 
+<p align="center">
+  <img src="docs/screenshots/expenses.png" width="200" alt="Expenses filtered by day, with bar chart">
+  <img src="docs/screenshots/statistics.png" width="200" alt="Statistics with live euro rate">
+  <img src="docs/screenshots/statistics-categories.png" width="200" alt="Spending by category and payment split">
+  <img src="docs/screenshots/add-expense.png" width="200" alt="Adding an expense">
+</p>
+
 ## Download
 
 Get the signed APK from the [latest release](https://github.com/Aymeric-Dcn/JapanExpenseTracker-Android/releases/latest)
