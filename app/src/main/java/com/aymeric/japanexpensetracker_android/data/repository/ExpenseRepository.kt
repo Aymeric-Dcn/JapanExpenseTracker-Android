@@ -16,7 +16,17 @@ class ExpenseRepository(
 
     fun getAllCategories(): Flow<List<String>> = expenseDao.getAllCategories()
 
+    suspend fun getExpense(id: Int): ExpenseEntity? = expenseDao.getExpenseById(id)
+
     suspend fun insertExpense(expense: ExpenseEntity) = expenseDao.insertExpense(expense)
+
+    /** Returns how many expenses were actually inserted (duplicates are skipped). */
+    suspend fun importExpenses(expenses: List<ExpenseEntity>): Int =
+        expenseDao.insertIgnoringDuplicates(expenses).count { it != -1L }
+
+    suspend fun updateExpense(expense: ExpenseEntity) = expenseDao.updateExpense(expense)
+
+    suspend fun deleteExpense(expense: ExpenseEntity) = expenseDao.deleteExpense(expense)
 
     suspend fun insertWithdrawal(withdrawal: WithdrawalEntity) =
         withdrawalDao.insertWithdrawal(withdrawal)

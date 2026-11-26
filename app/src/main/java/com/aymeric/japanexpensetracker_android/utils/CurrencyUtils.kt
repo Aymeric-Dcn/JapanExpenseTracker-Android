@@ -1,11 +1,15 @@
 package com.aymeric.japanexpensetracker_android.utils
 
-private const val YEN_TO_EURO_RATE = 0.0062
+import java.util.Locale
+import kotlin.math.abs
 
-fun formatAmount(amountYen: Double, showEuro: Boolean): String {
-    return if (showEuro) {
-        "%.2f €".format(amountYen * YEN_TO_EURO_RATE)
-    } else {
-        "%.2f ¥".format(amountYen)
-    }
+fun formatYen(amountYen: Long): String {
+    val sign = if (amountYen < 0) "-" else ""
+    return String.format(Locale.US, "%s¥%,d", sign, abs(amountYen))
 }
+
+fun formatEuro(amountYen: Long, yenToEur: Double): String =
+    String.format(Locale.US, "%,.2f €", amountYen * yenToEur)
+
+fun formatAmount(amountYen: Long, showEuro: Boolean, yenToEur: Double): String =
+    if (showEuro) formatEuro(amountYen, yenToEur) else formatYen(amountYen)

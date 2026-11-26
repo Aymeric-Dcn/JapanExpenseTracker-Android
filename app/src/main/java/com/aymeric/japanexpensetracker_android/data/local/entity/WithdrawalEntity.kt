@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class WithdrawalEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val dateMillis: Long,
-    val amountYen: Double
+    val amountYen: Long
 )
